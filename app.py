@@ -249,41 +249,32 @@ def predict_csv():
 # -------------------------------
 # Email Notification
 # -------------------------------
-def send_email(to_email, result):
+def send_email(receiver, result):
 
-    sender_email = "jegatheeswaranhitech057@gmail.com"
-    sender_password = "vsybbrayhfwgkfzg"
+    sender = os.environ.get("EMAIL_USER")
+    password = os.environ.get("EMAIL_PASS")
 
-    subject = "SolarSense Dust Prediction Report"
+    subject = "Solar Panel Dust Prediction Result"
 
     body = f"""
-SolarSense Prediction Report
-
-Dust Level: {result['level']}
-Energy Loss: {result['loss']} %
+Solar Dust Prediction Result
 
 Predicted Energy: {result['predicted_energy']} kWh
 Actual Energy: {result['actual_energy']} kWh
+Energy Loss: {result['loss']} %
 
-Recommendation: {result['action']}
-
-SolarSense ML System
+Dust Level: {result['dust_level']}
 """
 
-    msg = MIMEMultipart()
-
-    msg["From"] = sender_email
-    msg["To"] = to_email
+    msg = MIMEText(body)
     msg["Subject"] = subject
+    msg["From"] = sender
+    msg["To"] = receiver
 
-    msg.attach(MIMEText(body, "plain"))
-
-    with smtplib.SMTP("smtp.gmail.com", 587) as server:
+    with smtplib.SMTP("smtp.gmail.com", 587, timeout=30) as server:
         server.starttls()
-        server.login(sender_email, sender_password)
-        server.send_message(msg)
-
-
+        server.login(sender, password)
+        server.sendmail(sender, receiver, msg.as_string())
 # -------------------------------
 # Run Server
 # -------------------------------
