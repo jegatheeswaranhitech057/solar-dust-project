@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>SolarSense Login</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --solar-amber: #F59E0B;
+    --solar-orange: #EA580C;
+    --deep-space: #0A0E1A;
+    --panel-dark: #111827;
+    --panel-mid: #1F2937;
+    --text-muted: #6B7280;
+    --text-light: #D1D5DB;
+    --glow: rgba(245, 158, 11, 0.3);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--deep-space);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Animated solar background */
+  .bg-canvas {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  .sun-core {
+    position: absolute;
+    top: -180px;
+    right: -100px;
+    width: 480px;
+    height: 480px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #FDE68A 0%, #F59E0B 30%, #EA580C 65%, transparent 75%);
+    opacity: 0.18;
+    animation: pulse-sun 6s ease-in-out infinite;
+  }
+
+  .sun-ring {
+    position: absolute;
+    top: -230px;
+    right: -150px;
+    width: 580px;
+    height: 580px;
+    border-radius: 50%;
+    border: 1px solid rgba(245, 158, 11, 0.12);
+    animation: rotate-ring 20s linear infinite;
+  }
+
+  .sun-ring::before {
+    content: '';
+    position: absolute;
+    top: 20px; left: 20px; right: 20px; bottom: 20px;
+    border-radius: 50%;
+    border: 1px dashed rgba(245, 158, 11, 0.08);
+  }
+
+  .particle {
+    position: absolute;
+    border-radius: 50%;
+    background: var(--solar-amber);
+    opacity: 0;
+    animation: drift 8s ease-in-out infinite;
+  }
+
+  .p1 { width: 3px; height: 3px; top: 20%; left: 15%; animation-delay: 0s; }
+  .p2 { width: 2px; height: 2px; top: 60%; left: 8%; animation-delay: 1.5s; }
+  .p3 { width: 4px; height: 4px; top: 40%; left: 85%; animation-delay: 3s; }
+  .p4 { width: 2px; height: 2px; top: 75%; left: 70%; animation-delay: 4.5s; }
+  .p5 { width: 3px; height: 3px; top: 10%; left: 50%; animation-delay: 6s; }
+
+  .grid-overlay {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(245,158,11,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(245,158,11,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+
+  @keyframes pulse-sun {
+    0%, 100% { transform: scale(1); opacity: 0.18; }
+    50% { transform: scale(1.08); opacity: 0.24; }
+  }
+
+  @keyframes rotate-ring {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  @keyframes drift {
+    0% { opacity: 0; transform: translateY(0px); }
+    30% { opacity: 0.6; }
+    70% { opacity: 0.4; }
+    100% { opacity: 0; transform: translateY(-80px); }
+  }
+
+  /* Login card */
+  .login-wrapper {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 440px;
+    padding: 1.5rem;
+    animation: slideUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  @keyframes slideUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .login-card {
+    background: rgba(17, 24, 39, 0.85);
+    border: 1px solid rgba(245, 158, 11, 0.15);
+    border-radius: 20px;
+    padding: 2.8rem 2.4rem;
+    backdrop-filter: blur(20px);
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.04),
+      0 25px 60px rgba(0,0,0,0.6),
+      0 0 80px rgba(245, 158, 11, 0.06);
+  }
+
+  /* Header */
+  .brand-icon {
+    width: 52px;
+    height: 52px;
+    background: linear-gradient(135deg, #F59E0B, #EA580C);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 0 30px rgba(245, 158, 11, 0.4);
+    position: relative;
+  }
+
+  .brand-icon svg {
+    width: 26px;
+    height: 26px;
+    fill: white;
+  }
+
+  .brand-icon::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 18px;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    animation: icon-glow 3s ease-in-out infinite;
+  }
+
+  @keyframes icon-glow {
+    0%, 100% { opacity: 0.4; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.05); }
+  }
+
+  .login-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.65rem;
+    font-weight: 800;
+    color: #F9FAFB;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    margin-bottom: 0.35rem;
+  }
+
+  .login-subtitle {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    font-weight: 400;
+    margin-bottom: 2rem;
+  }
+
+  /* Divider line */
+  .header-divider {
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(to right, rgba(245,158,11,0.3), rgba(245,158,11,0.05), transparent);
+    margin-bottom: 2rem;
+  }
+
+  /* Form elements */
+  .form-label {
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.45rem;
+  }
+
+  .input-group-custom {
+    position: relative;
+    margin-bottom: 1.4rem;
+  }
+
+  .input-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    z-index: 2;
+    pointer-events: none;
+    transition: color 0.2s;
+  }
+
+  .form-control-custom {
+    width: 100%;
+    background: rgba(31, 41, 55, 0.8);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    padding: 0.75rem 1rem 0.75rem 2.75rem;
+    color: #F9FAFB;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    transition: all 0.25s ease;
+    outline: none;
+  }
+
+  .form-control-custom::placeholder {
+    color: rgba(107, 114, 128, 0.7);
+  }
+
+  .form-control-custom:focus {
+    border-color: var(--solar-amber);
+    background: rgba(31, 41, 55, 1);
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.12);
+  }
+
+  .form-control-custom:focus + .input-icon,
+  .input-group-custom:focus-within .input-icon {
+    color: var(--solar-amber);
+  }
+
+  .toggle-password {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    cursor: pointer;
+    z-index: 2;
+    transition: color 0.2s;
+  }
+
+  .toggle-password:hover { color: var(--solar-amber); }
+
+  /* Remember / Forgot row */
+  .meta-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.8rem;
+  }
+
+  .form-check-custom {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+  }
+
+  .form-check-custom input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--solar-amber);
+    cursor: pointer;
+  }
+
+  .form-check-custom label {
+    font-size: 0.83rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .forgot-link {
+    font-size: 0.83rem;
+    color: var(--solar-amber);
+    text-decoration: none;
+    font-weight: 500;
+    transition: opacity 0.2s;
+  }
+
+  .forgot-link:hover { opacity: 0.75; color: var(--solar-amber); }
+
+  /* Login button */
+  .btn-solar {
+    width: 100%;
+    padding: 0.85rem;
+    background: linear-gradient(135deg, #F59E0B 0%, #EA580C 100%);
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(245, 158, 11, 0.3);
+  }
+
+  .btn-solar::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+    transition: left 0.5s ease;
+  }
+
+  .btn-solar:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(245, 158, 11, 0.45);
+  }
+
+  .btn-solar:hover::before { left: 100%; }
+
+  .btn-solar:active { transform: translateY(0); }
+
+  /* Flash message */
+  .alert-solar {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 10px;
+    padding: 0.7rem 1rem;
+    color: #FCA5A5;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 1.4rem;
+  }
+
+  /* Footer */
+  .card-footer-text {
+    text-align: center;
+    margin-top: 1.6rem;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+
+  .card-footer-text span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #10B981;
+    box-shadow: 0 0 8px #10B981;
+    animation: blink 2.5s ease-in-out infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Background -->
+<div class="bg-canvas">
+  <div class="sun-core"></div>
+  <div class="sun-ring"></div>
+  <div class="grid-overlay"></div>
+  <div class="particle p1"></div>
+  <div class="particle p2"></div>
+  <div class="particle p3"></div>
+  <div class="particle p4"></div>
+  <div class="particle p5"></div>
+</div>
+
+<!-- Login Card -->
+<div class="login-wrapper">
+  <div class="login-card">
+
+    <!-- Brand -->
+    <div class="brand-icon">
+      <!-- Sun / solar icon -->
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="12" cy="12" r="5"/>
+        <line x1="12" y1="1" x2="12" y2="3" stroke="white" stroke-width="2" stroke-linecap="round"/>
+        <line x1="12" y1="21" x2="12" y2="23" stroke="white" stroke-width="2" stroke-linecap="round"/>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke="white" stroke-width="2" stroke-linecap="round"/>
+        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" stroke="white" stroke-width="2" stroke-linecap="round"/>
+        <line x1="1" y1="12" x2="3" y2="12" stroke="white" stroke-width="2" stroke-linecap="round"/>
+        <line x1="21" y1="12" x2="23" y2="12" stroke="white" stroke-width="2" stroke-linecap="round"/>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke="white" stroke-width="2" stroke-linecap="round"/>
+        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke="white" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <h1 class="login-title">Solar Dust Detection</h1>
+    <p class="login-subtitle">Sign in to access your monitoring dashboard</p>
+
+    <div class="header-divider"></div>
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="alert-solar">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          {{ messages[0] }}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <!-- Form -->
+    <form method="POST">
+
+      <label class="form-label" for="username">Username</label>
+      <div class="input-group-custom">
+        <input
+          class="form-control-custom"
+          type="text"
+          id="username"
+          name="username"
+          placeholder="Enter your username"
+          required
+          autocomplete="username"
+        >
+        <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </div>
+
+      <label class="form-label" for="password">Password</label>
+      <div class="input-group-custom">
+        <input
+          class="form-control-custom"
+          type="password"
+          id="password"
+          name="password"
+          placeholder="Enter your password"
+          required
+          autocomplete="current-password"
+          style="padding-right: 2.75rem;"
+        >
+        <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <span class="toggle-password" onclick="togglePassword()" title="Show/hide password">
+          <svg id="eye-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </span>
+      </div>
+
+      <div class="meta-row">
+        <label class="form-check-custom">
+          <input type="checkbox" name="remember">
+          <label>Remember me</label>
+        </label>
+        <a href="#" class="forgot-link">Forgot password?</a>
+      </div>
+
+      <button type="submit" class="btn-solar">
+        Sign In &nbsp;→
+      </button>
+
+    </form>
+
+    <div class="card-footer-text">
+      <span>
+        <span class="status-dot"></span>
+        All systems operational · SolarSense v2.4
+      </span>
+    </div>
+
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+<script>
+  function togglePassword() {
+    const pwd = document.getElementById('password');
+    const icon = document.getElementById('eye-icon');
+    if (pwd.type === 'password') {
+      pwd.type = 'text';
+      icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
+    } else {
+      pwd.type = 'password';
+      icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+    }
+  }
+</script>
+</body>
+</html>
