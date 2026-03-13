@@ -263,7 +263,7 @@ Predicted Energy: {result['predicted_energy']} kWh
 Actual Energy: {result['actual_energy']} kWh
 Energy Loss: {result['loss']} %
 
-Dust Level: {result['dust_level']}
+Dust Level: {result['level']}
 """
 
     msg = MIMEText(body)
