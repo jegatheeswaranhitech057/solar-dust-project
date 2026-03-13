@@ -170,7 +170,7 @@ def predict_manual():
     email = request.form.get("email")
 
     if email:
-        #send_email(email, result)
+        send_email(email, result)
 
     return render_template("result.html", result=result)
 
