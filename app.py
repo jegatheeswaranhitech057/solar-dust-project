@@ -168,13 +168,13 @@ def predict_manual():
     }
 
     email = request.form.get("email")
-'''
-    if email:
-        send_email(email, result)
+
+    #if email:
+       # send_email(email, result)
 
     return render_template("result.html", result=result)
 
-'''
+
 # -------------------------------
 # CSV Prediction
 # -------------------------------
@@ -283,4 +283,5 @@ Dust Level: {result['level']}
 # Run Server
 # -------------------------------
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
