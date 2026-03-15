@@ -168,13 +168,13 @@ def predict_manual():
     }
 
     email = request.form.get("email")
-
+'''
     if email:
         send_email(email, result)
 
     return render_template("result.html", result=result)
 
-
+'''
 # -------------------------------
 # CSV Prediction
 # -------------------------------
@@ -249,6 +249,7 @@ def predict_csv():
 # -------------------------------
 # Email Notification
 # -------------------------------
+'''
 def send_email(receiver, result):
 
     sender = os.environ.get("EMAIL_USER")
@@ -270,13 +271,11 @@ Dust Level: {result['level']}
     msg["Subject"] = subject
     msg["From"] = sender
     msg["To"] = receiver
-    try:
-        with smtplib.SMTP("smtp.gmail.com", 587, timeout=30) as server:
+    with smtplib.SMTP("smtp.gmail.com", 587, timeout=30) as server:
         server.starttls()
         server.login(sender, password)
         server.sendmail(sender, receiver, msg.as_string())
-    except:
-        print("Email sending failed:", e)
+   '''
 # -------------------------------
 
 
