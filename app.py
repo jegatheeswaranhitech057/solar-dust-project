@@ -270,12 +270,17 @@ Dust Level: {result['level']}
     msg["Subject"] = subject
     msg["From"] = sender
     msg["To"] = receiver
-
-    with smtplib.SMTP("smtp.gmail.com", 587, timeout=30) as server:
+    try:
+        with smtplib.SMTP("smtp.gmail.com", 587, timeout=30) as server:
         server.starttls()
         server.login(sender, password)
         server.sendmail(sender, receiver, msg.as_string())
+    except:
+        print("Email sending failed:", e)
 # -------------------------------
+
+
+    
 # Run Server
 # -------------------------------
 if __name__ == "__main__":
